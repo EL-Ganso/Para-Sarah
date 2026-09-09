@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti 🌸</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #090a0f; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .textos {
+            position: absolute;
+            bottom: 5%;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.5rem;
+            color: #ff9a9e;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8), 0 0 20px rgba(255, 154, 158, 0.8);
+            margin: 0;
+            opacity: 0;
+            animation: aparecerTexto 3s ease 3.5s forwards; 
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #dfe6e9;
+            font-weight: 400;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            opacity: 0;
+            animation: aparecerTexto 3s ease 4.5s forwards; 
+            padding: 0 20px;
+        }
+
+        @keyframes aparecerTexto {
+            to { opacity: 1; transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="lienzo"></canvas>
+    
+    <div class="textos">
+        <h1>Te amo, Sarah</h1>
+        <h2>ya viste que llueven boneless? cuando hize esto me antoje :D</h2>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('lienzo');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let lluviaBoneless = [];
+
+        // --- SISTEMA DE LLUVIA DE BONELESS (ESTILO KFC) ---
+        class Boneless {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -canvas.height * 2; 
+                this.velocidadY = Math.random() * 2 + 1; 
+                this.velocidadX = (Math.random() - 0.5) * 1.5; 
+                this.rotacion = Math.random() * 360;
+                this.velocidadRotacion = (Math.random() - 0.5) * 2;
+                
+                this.bultos = [];
+                const cantidadBultos = Math.floor(Math.random() * 3) + 4; 
+                for (let i = 0; i < cantidadBultos; i++) {
+                    this.bultos.push({
+                        x: (Math.random() - 0.5) * 25,
+                        y: (Math.random() - 0.5) * 25,
+                        r: Math.random() * 10 + 8
+                    });
+                }
+                this.colorSalsa = '#e67e22'; 
+            }
+
+            actualizar() {
+                this.y += this.velocidadY;
+                this.x += this.velocidadX;
+                this.rotacion += this.velocidadRotacion;
+
+                if (this.y > canvas.height + 50) {
+                    this.y = -50;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            dibujar() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotacion * Math.PI / 180);
+                
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+
+                ctx.fillStyle = this.colorSalsa;
+                ctx.beginPath();
+                this.bultos.forEach(b => {
+                    ctx.moveTo(b.x, b.y);
+                    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                });
+                ctx.fill();
+
+                ctx.shadowColor = 'transparent';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; 
+                
+                this.bultos.forEach(b => {
+                    ctx.beginPath();
+                    ctx.arc(b.x - b.r/3, b.y - b.r/3, b.r/4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 35; i++) {
+            lluviaBoneless.push(new Boneless());
+        }
+
+        // --- SISTEMA DEL CORAZÓN MATEMÁTICO ---
+        const lineasCorazon = [];
+        let indiceCorazon = 0; 
+        
+        for (let i = 0; i < 320; i++) {
+            let a = 2 * Math.PI * i / 320;
+            let x = 16 * Math.pow(Math.sin(a), 3);
+            let y = 13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a);
+            y = -y; 
+            
+            let scale = 22; // MODIFICADO: Aumentado de 14 a 22 para un corazón más grande
+            let xo = x * scale;
+            let yo = y * scale;
+            let L = 0.15 + Math.random() * 0.35; 
+            let x1 = xo * (1 - L);
+            let y1 = yo * (1 - L);
+            
+            lineasCorazon.push({ xo, yo, x1, y1 });
+        }
+
+        // --- SISTEMA DE LA AMAPOLA ESTILO "NEÓN MATEMÁTICO" ---
+        function crearAmapolaNeon() {
+            const offCanvas = document.createElement('canvas');
+            const octx = offCanvas.getContext('2d');
+            offCanvas.width = 600;
+            offCanvas.height = 800; 
+
+            const cx = 300;
+            const cy = 250; 
+
+            octx.lineCap = "round";
+            octx.lineJoin = "round";
+
+            octx.beginPath();
+            octx.moveTo(cx, cy + 20);
+            octx.bezierCurveTo(cx - 30, cy + 200, cx + 50, cy + 400, cx - 60, cy + 550);
+            octx.strokeStyle = '#7bed9f';
+            octx.lineWidth = 4;
+            octx.shadowColor = '#2ed573';
+            octx.shadowBlur = 15;
+            octx.stroke();
+
+            function dibujarHojaNeon(startX, startY, tipX, tipY, ctrlX, ctrlY) {
+                for (let i = 0; i <= 20; i++) {
+                    let t = i / 20;
+                    let edgeX = startX * Math.pow(1-t, 2) + ctrlX * 2 * (1-t) * t + tipX * Math.pow(t, 2);
+                    let edgeY = startY * Math.pow(1-t, 2) + ctrlY * 2 * (1-t) * t + tipY * Math.pow(t, 2);
+
+                    octx.beginPath();
+                    octx.moveTo(startX, startY);
+                    
+                    let veinCtrlX = startX + (edgeX - startX) * 0.5 + (tipY - startY) * 0.1;
+                    let veinCtrlY = startY + (edgeY - startY) * 0.5 - (tipX - startX) * 0.1;
+                    octx.quadraticCurveTo(veinCtrlX, veinCtrlY, edgeX, edgeY);
+
+                    octx.strokeStyle = `rgba(120, 255, 150, ${0.1 + t*0.3})`;
+                    octx.lineWidth = 1.5;
+                    octx.shadowBlur = 5;
+                    octx.shadowColor = '#2ed573';
+                    octx.stroke();
+                }
+            }
+            
+            dibujarHojaNeon(cx - 15, cy + 180, cx - 220, cy + 80, cx - 180, cy + 250);
+            dibujarHojaNeon(cx - 15, cy + 180, cx - 220, cy + 80, cx - 60, cy + 60);
+            
+            dibujarHojaNeon(cx + 20, cy + 300, cx + 250, cy + 150, cx + 200, cy + 350);
+            dibujarHojaNeon(cx + 20, cy + 300, cx + 250, cy + 150, cx + 100, cy + 150);
+
+            octx.shadowBlur = 12;
+            octx.shadowColor = '#ff4757';
+            
+            for (let layer = 0; layer < 2; layer++) { 
+                let numPetalos = 6;
+                let offsetRot = layer * (Math.PI / numPetalos);
+                
+                for (let p = 0; p < numPetalos; p++) {
+                    let baseAng = (p * 2 * Math.PI) / numPetalos + offsetRot;
+                    
+                    for (let i = -25; i <= 25; i+=0.5) {
+                        let f = i / 25; 
+                        let ang = baseAng + f * 0.65; 
+                        let length = (layer === 0 ? 170 : 120) - Math.abs(f) * 40;
+                        length += Math.sin(i * 0.5) * 10; 
+
+                        let startX = cx + Math.cos(ang) * 25;
+                        let startY = cy + Math.sin(ang) * 25;
+                        let endX = cx + Math.cos(ang) * length;
+                        let endY = cy + Math.sin(ang) * length;
+
+                        let cpAng = ang + 0.5 * Math.sign(f);
+                        let cpDist = length * 0.7;
+                        let cpX = cx + Math.cos(cpAng) * cpDist;
+                        let cpY = cy + Math.sin(cpAng) * cpDist;
+
+                        octx.beginPath();
+                        octx.moveTo(startX, startY);
+                        octx.quadraticCurveTo(cpX, cpY, endX, endY);
+
+                        let red = 255;
+                        let green = layer === 0 ? 40 + Math.abs(f)*60 : 70;
+                        let blue = layer === 0 ? 80 + Math.abs(f)*80 : 130;
+                        octx.strokeStyle = `rgba(${red}, ${green}, ${blue}, 0.5)`;
+                        octx.lineWidth = 1.2;
+                        octx.stroke();
+                    }
+                }
+            }
+
+            octx.shadowBlur = 0;
+            octx.fillStyle = '#1e272e';
+            octx.beginPath();
+            octx.arc(cx, cy, 38, 0, Math.PI * 2);
+            octx.fill();
+
+            for(let i = 0; i < 360; i += 7) {
+                let a = i * Math.PI/180;
+                octx.beginPath();
+                octx.moveTo(cx + Math.cos(a)*38, cy + Math.sin(a)*38);
+                octx.lineTo(cx + Math.cos(a)*60, cy + Math.sin(a)*60);
+                octx.strokeStyle = 'rgba(255, 200, 100, 0.4)';
+                octx.lineWidth = 1.5;
+                octx.stroke();
+                
+                octx.beginPath();
+                octx.arc(cx + Math.cos(a)*60, cy + Math.sin(a)*60, 2, 0, Math.PI*2);
+                octx.fillStyle = '#f6e58d';
+                octx.fill();
+            }
+
+            octx.shadowBlur = 4;
+            octx.shadowColor = '#f39c12';
+            for (let i = 0; i < 180; i++) {
+                let a = i * 137.5 * (Math.PI / 180);
+                let r = 2.6 * Math.sqrt(i);
+                let x = cx + r * Math.cos(a);
+                let y = cy + r * Math.sin(a);
+                
+                octx.beginPath();
+                octx.arc(x, y, 1.5, 0, Math.PI * 2);
+                octx.fillStyle = (i % 3 === 0) ? '#f1c40f' : '#e67e22';
+                octx.fill();
+            }
+
+            return offCanvas;
+        }
+
+        const imagenFlorNeon = crearAmapolaNeon();
+
+        // --- BUCLE PRINCIPAL DE ANIMACIÓN ---
+        function animar() {
+            ctx.fillStyle = 'rgba(9, 10, 15, 0.2)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let centroX = canvas.width / 2;
+            let centroY = canvas.height / 2 - 80;
+
+            // 1. Dibujar boneless en el fondo
+            lluviaBoneless.forEach(b => {
+                b.actualizar();
+                b.dibujar();
+            });
+
+            // 2. Dibujar la amapola neón estática
+            ctx.drawImage(imagenFlorNeon, centroX - 300, centroY - 250);
+
+            // 3. Dibujar y animar el CORAZÓN MATEMÁTICO abrazando la flor
+            ctx.save();
+            ctx.translate(centroX, centroY); 
+
+            if (indiceCorazon < 320) {
+                indiceCorazon += 0.3; // MODIFICADO: Reducido drásticamente de 2.5 a 0.3 para formación muy lenta
+            }
+
+            for (let i = 0; i < Math.min(indiceCorazon, lineasCorazon.length); i++) {
+                let linea = lineasCorazon[i];
+                
+                for(let j = 0; j < 10; j++) {
+                    let f = j / 10;
+                    let r = Math.floor((1 - 0.6 * f) * 255);
+                    let g = Math.floor((0.7 * (1 - f)) * 255);
+                    let b = Math.floor((0.8 * (1 - f)) * 255);
+                    
+                    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.lineWidth = 1.5;
+                    
+                    ctx.beginPath();
+                    let startX = linea.xo + (linea.x1 - linea.xo) * f;
+                    let startY = linea.yo + (linea.y1 - linea.yo) * f;
+                    let endX = linea.xo + (linea.x1 - linea.xo) * (f + 0.1);
+                    let endY = linea.yo + (linea.y1 - linea.yo) * (f + 0.1);
+                    
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+
+            requestAnimationFrame(animar);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animar();
+    </script>
+</body>
+</html>

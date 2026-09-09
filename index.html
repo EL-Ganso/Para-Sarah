@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti, Sarah ❤️</title>
+    <!-- Librería para el efecto de confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap');
+
+        /* === FONDO DE GALAXIA === */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto; /* Permite bajar para ver el contrato */
+            padding-bottom: 40px;
+            text-align: center;
+            color: white; /* Texto blanco para resaltar en la galaxia */
+        }
+
+        /* Estrellas generadas por JS */
+        .estrella {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+            animation: parpadeo infinite ease-in-out;
+        }
+
+        @keyframes parpadeo {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* === ANIMACIÓN DE LA AMAPOLA DIGITAL === */
+        .amapola-container {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(231, 76, 60, 0.5)); /* Brillo digital */
+        }
+
+        .amapola path, .amapola circle {
+            fill: transparent;
+            stroke-width: 2.5;
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: dibujar 3s ease forwards;
+        }
+
+        .tallo { 
+            stroke: #2ecc71; 
+        }
+        .petalo { 
+            stroke: #ff4757; 
+            /* Se dibuja por 3s, luego se rellena de color en el 3er segundo */
+            animation: dibujar 3s ease forwards, rellenarPetalo 1.5s 2.5s forwards; 
+        }
+        .centro { 
+            stroke: #f1c40f; 
+            animation: dibujar 3s ease forwards, rellenarCentro 1.5s 2.5s forwards; 
+        }
+
+        @keyframes dibujar {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes rellenarPetalo {
+            to { fill: #ff4757; stroke: transparent; }
+        }
+        @keyframes rellenarCentro {
+            to { fill: #2c3e50; stroke: transparent; }
+        }
+
+        /* === TEXTOS Y BOTONES === */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
+            color: #ff9a9e; /* Rosa galáctico */
+            margin-bottom: 5px;
+            margin-top: 0;
+            text-shadow: 0 0 15px rgba(255, 154, 158, 0.6);
+            transition: all 0.5s ease;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: #dfe6e9;
+            margin-bottom: 40px;
+            padding: 0 20px;
+            font-weight: 400;
+        }
+
+        .botones {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+        }
+
+        button {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #btn-si {
+            background: linear-gradient(45deg, #ff7675, #d63031);
+            color: white;
+            margin-right: 20px;
+        }
+
+        #btn-si:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 118, 117, 0.8);
+        }
+
+        #btn-no {
+            background-color: #2d3436;
+            color: white;
+            border: 1px solid #636e72;
+            position: absolute;
+        }
+
+        /* === CONTRATO GRACIOSO === */
+        #mensaje-gracioso {
+            display: none;
+            font-size: 1.1rem;
+            color: #2d3436;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 20px;
+            line-height: 1.8;
+            max-width: 600px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            animation: aparecer 1s ease forwards;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ul {
+            text-align: left;
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        li {
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dibujo digital de la amapola -->
+    <div class="amapola-container" id="flor">
+        <svg class="amapola" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path class="tallo" d="M50,55 Q45,80 50,100" />
+            <path class="petalo" d="M50,55 C20,65 10,35 30,25 C45,15 50,40 50,40 Z" />
+            <path class="petalo" d="M50,55 C80,65 90,35 70,25 C55,15 50,40 50,40 Z" />
+            <path class="petalo" d="M50,55 C25,35 40,5 50,15 C60,5 75,35 50,55 Z" />
+            <circle class="centro" cx="50" cy="46" r="5" />
+        </svg>
+    </div>
+
+    <h1 id="titulo">Te amo, Sarah</h1>
+    <h2 id="subtitulo">¿Quieres ser mi novia?</h2>
+
+    <div class="botones" id="div-botones">
+        <button id="btn-si">Sí</button>
+        <button id="btn-no">No</button>
+    </div>
+
+    <div id="mensaje-gracioso">
+        <h3 style="color: #d63031; margin-top: 0;">¡Contrato firmado digitalmente! 📜💖</h3>
+        <p>Al hacer clic en "Sí", Sarah ha aceptado los siguientes <strong>Términos y Condiciones</strong> sin posibilidad de devolución ni reembolso:</p>
+        <ul>
+            <li>🍕 <strong>Artículo 1:</strong> La obligación inquebrantable de compartir tus papas fritas y taquitos conmigo.</li>
+            <li>🎮 <strong>Artículo 2:</strong> Jugar videojuegos juntos (o al menos verme manquear un rato con paciencia).</li>
+            <li>😘 <strong>Artículo 3:</strong> Suministro ilimitado, constante y sin restricciones de besitos y abrazos.</li>
+            <li>🤡 <strong>Artículo 4:</strong> Reírte de mis chistes malos, incluso si no dan risa, por el resto de nuestros días.</li>
+        </ul>
+        <p><em>Y no me paresco al mono de Roblox, soy mas a lo henry cavill</em> 🎉</p>
+		<div style="text-align: center; margin-top: 30px;">
+            <a href="amapola.html" id="btn-sorpresa" style="display: inline-block; background: linear-gradient(45deg, #a29bfe, #6c5ce7); color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.3s;">
+                ✨ Haz clic aquí para tu sorpresa final ✨
+            </a>
+    </div>
+
+    <script>
+        // --- EFECTO DE GALAXIA ---
+        function crearEstrellas() {
+            const cantidadEstrellas = 100;
+            const body = document.querySelector('body');
+            
+            for (let i = 0; i < cantidadEstrellas; i++) {
+                const estrella = document.createElement('div');
+                estrella.classList.add('estrella');
+                
+                // Posición aleatoria
+                estrella.style.left = `${Math.random() * 100}vw`;
+                estrella.style.top = `${Math.random() * 100}vh`;
+                
+                // Tamaño aleatorio (entre 1px y 3px)
+                const tamaño = Math.random() * 2 + 1;
+                estrella.style.width = `${tamaño}px`;
+                estrella.style.height = `${tamaño}px`;
+                
+                // Duración de la animación (parpadeo) aleatoria
+                estrella.style.animationDuration = `${Math.random() * 3 + 1.5}s`;
+                estrella.style.animationDelay = `${Math.random() * 2}s`;
+                
+                // Colores ligeros para algunas estrellas (azulado, rojizo)
+                const colores = ['#ffffff', '#ffffff', '#ffeaa7', '#81ecec', '#fab1a0'];
+                estrella.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                
+                body.appendChild(estrella);
+            }
+        }
+        crearEstrellas();
+
+        // --- LÓGICA DE LOS BOTONES ---
+        const btnNo = document.getElementById('btn-no');
+        const btnSi = document.getElementById('btn-si');
+        const divBotones = document.getElementById('div-botones');
+        const titulo = document.getElementById('titulo');
+        const subtitulo = document.getElementById('subtitulo');
+        const mensajeGracioso = document.getElementById('mensaje-gracioso');
+        const flor = document.getElementById('flor');
+
+        // El botón "No" se escapa de forma inteligente
+        btnNo.addEventListener('mouseover', () => {
+            const maxWidth = window.innerWidth - btnNo.offsetWidth - 20;
+            const maxHeight = window.innerHeight - btnNo.offsetHeight - 20;
+            
+            // Calcula coordenadas asegurándose de que no se salga de la pantalla
+            const x = Math.max(20, Math.random() * maxWidth) - (window.innerWidth / 2 - btnNo.offsetWidth / 2);
+            const y = Math.max(20, Math.random() * maxHeight) - (window.innerHeight / 2 - btnNo.offsetHeight / 2);
+            
+            btnNo.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        // Cuando dice que "Sí"
+        btnSi.addEventListener('click', () => {
+            // Lluvia de confeti
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff9a9e', '#d63031', '#ffffff', '#f1c40f']
+            });
+
+            // Ocultar botones, pregunta original y la flor
+            divBotones.style.display = 'none';
+            subtitulo.style.display = 'none';
+            flor.style.display = 'none';
+
+            // Cambiar el título
+            titulo.innerHTML = '¡Sabía que dirías que sí! 😍';
+            
+            // Mostrar el contrato gracioso
+            mensajeGracioso.style.display = 'block';
+            
+            // Baja automáticamente la pantalla para que vea el contrato completo
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+    </script>
+
+</body>
+</html>
