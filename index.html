@@ -170,6 +170,229 @@
             border-bottom: 1px dashed #ccc;
             padding-bottom: 5px;
         }
+
+        /* === SUCULENTAS === */
+        .jardin {
+            position: absolute;
+            left: 0; right: 0; bottom: 40px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            pointer-events: none;
+            z-index: 0;
+            padding: 0 1vw;
+        }
+        .sucu {
+            width: var(--w);
+            flex: none;
+            transform-origin: 50% 100%;
+            animation: brotar 1.3s cubic-bezier(.34, 1.56, .64, 1) var(--d) both,
+                       mecer 6s ease-in-out calc(var(--d) + 1.4s) infinite;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35));
+        }
+        .sucu svg { display: block; width: 100%; height: auto; }
+        @keyframes brotar { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes mecer { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+
+        /* ================= MEJORAS (todo lo de arriba queda igual) ================= */
+        body { position: relative; }
+
+        /* Estrellas fugaces */
+        .fugaz {
+            position: absolute;
+            width: 90px; height: 2px;
+            background: linear-gradient(90deg, #fff, transparent);
+            border-radius: 2px;
+            opacity: 0;
+            z-index: -1;
+            animation: fugaz 1.4s ease-out forwards;
+        }
+        @keyframes fugaz {
+            0%   { opacity: 0; transform: translate(0, 0) rotate(-35deg); }
+            15%  { opacity: 1; }
+            100% { opacity: 0; transform: translate(-320px, 220px) rotate(-35deg); }
+        }
+
+        /* Pista cuando el "No" se escapa */
+        #pista {
+            position: absolute;
+            left: 0; right: 0; top: 78px;
+            font-size: 1rem;
+            color: #b2bec3;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity .4s;
+            pointer-events: none;
+        }
+        #pista.on { opacity: 1; }
+        #btn-si { transition: transform 0.2s, box-shadow 0.2s, font-size .3s, padding .3s; }
+
+        /* ================= SECCIÓN DE SILVER ================= */
+        #silver {
+            display: none;
+            position: relative;
+            z-index: 10;
+            width: min(92vw, 520px);
+            margin-top: 50px;
+            animation: aparecer 1.2s ease forwards;
+        }
+        .silver-titulo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.6rem;
+            color: #dfe6e9;
+            margin: 0 0 6px;
+            text-shadow: 0 0 14px rgba(180, 190, 205, .55);
+        }
+        .silver-sub { color: #b2bec3; margin: 0 0 10px; font-size: 1rem; }
+
+        #silver-escena {
+            position: relative;
+            width: min(340px, 82vw);
+            aspect-ratio: 300 / 330;
+            margin: 0 auto;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        #silver-escena::before { /* halo de luz detrás del gatito */
+            content: "";
+            position: absolute;
+            inset: 4% 4% 0;
+            background: radial-gradient(circle at 50% 55%, rgba(190, 205, 235, .30), rgba(190, 205, 235, 0) 68%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        #silver-svg { position: relative; width: 100%; height: 100%; overflow: visible; display: block; }
+
+        /* Cómo se va formando: primero el contorno se traza, luego se rellena */
+        .parte {
+            fill-opacity: 0;
+            stroke: #eef2f7;
+            stroke-width: 3;
+            stroke-linejoin: round;
+            stroke-dasharray: 1;
+            stroke-dashoffset: 1;
+            opacity: 0;
+        }
+        .forma .parte { animation: trazar 1.3s ease-out var(--d) forwards, rellenar 1s ease calc(var(--d) + 1.1s) forwards; }
+        .trazo { fill: none; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+        .forma .trazo { animation: trazar 1.1s ease-out var(--d) forwards; }
+        .aparece { opacity: 0; transform-box: fill-box; transform-origin: center; }
+        .forma .aparece { animation: surgir .8s ease-out var(--d) forwards; }
+        @keyframes trazar   { 0% { opacity: 1; stroke-dashoffset: 1; } 100% { opacity: 1; stroke-dashoffset: 0; } }
+        @keyframes rellenar { to { fill-opacity: 1; stroke: #69727e; } }
+        @keyframes surgir   { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+
+        /* Vida propia cuando termina de formarse */
+        .parpadeo { transform-box: fill-box; transform-origin: center; animation: parpadear 4.2s infinite; }
+        @keyframes parpadear { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+        .listo .cola-g   { transform-origin: 205px 296px; animation: menear 2.6s ease-in-out infinite; }
+        .listo .cabeza-g { transform-origin: 150px 175px; animation: inclinar 6s ease-in-out infinite; }
+        @keyframes menear   { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(7deg); } }
+        @keyframes inclinar { 0%, 100% { transform: rotate(0deg); } 35% { transform: rotate(3deg); } 70% { transform: rotate(-2.5deg); } }
+        #silver-svg.ronrronea #gato { transform-origin: 150px 300px; animation: vibra .09s linear 9; }
+        @keyframes vibra { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.6px); } 75% { transform: translateX(1.6px); } }
+
+        .burbuja {
+            position: absolute;
+            top: 1%; right: -2%;
+            max-width: 52%;
+            background: rgba(255, 255, 255, .95);
+            color: #2d3436;
+            padding: 10px 16px;
+            border-radius: 18px 18px 18px 4px;
+            font-size: .95rem;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
+            opacity: 0;
+            transform: translateY(10px) scale(.9);
+            transition: opacity .6s, transform .6s cubic-bezier(.34, 1.56, .64, 1);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .burbuja.on { opacity: 1; transform: translateY(0) scale(1); }
+
+        .polvo-p {
+            position: absolute;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: #dfe9ff;
+            box-shadow: 0 0 8px 2px rgba(200, 220, 255, .85);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .corazon-flota {
+            position: absolute;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .silver-tarjeta {
+            background: rgba(255, 255, 255, .92);
+            color: #2d3436;
+            border-radius: 20px;
+            padding: 22px 26px;
+            margin-top: 22px;
+            line-height: 1.7;
+            text-align: left;
+            box-shadow: 0 0 30px rgba(255, 255, 255, .15);
+        }
+        .silver-tarjeta p { margin: 0 0 8px; }
+        .silver-tarjeta p:last-child { margin-bottom: 0; }
+
+        .btn-suave {
+            font-size: 1rem !important;
+            padding: 10px 24px !important;
+            margin-top: 16px;
+            background: rgba(255, 255, 255, .1);
+            color: #dfe6e9;
+            border: 1px solid rgba(255, 255, 255, .3);
+        }
+        .btn-suave:hover { background: rgba(255, 255, 255, .2); }
+
+        .btn-final {
+            display: inline-block;
+            margin-top: 26px;
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Botoncito flotante que invita a bajar con Silver */
+        #pill-silver {
+            display: none;
+            position: fixed;
+            left: 50%; bottom: 18px;
+            transform: translateX(-50%);
+            z-index: 50;
+            font-size: 1rem;
+            padding: 12px 22px;
+            background: rgba(20, 24, 36, .92);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .35);
+            animation: rebote 1.6s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        @keyframes rebote { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-7px); } }
+
+        /* === Celulares === */
+        @media (max-width: 600px) {
+            h1 { font-size: 3.4rem; }
+            h2 { font-size: 1.6rem; margin-bottom: 30px; }
+            button { font-size: 1.2rem; padding: 12px 30px; }
+            #mensaje-gracioso { margin-left: 14px; margin-right: 14px; padding: 22px; font-size: 1rem; }
+            .silver-titulo { font-size: 2.1rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .fugaz { display: none; }
+            .sucu, #pill-silver { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -191,6 +414,7 @@
     <div class="botones" id="div-botones">
         <button id="btn-si">Sí</button>
         <button id="btn-no">No</button>
+        <span id="pista"></span>
     </div>
 
     <div id="mensaje-gracioso">
@@ -207,7 +431,108 @@
             <a href="amapola.html" id="btn-sorpresa" style="display: inline-block; background: linear-gradient(45deg, #a29bfe, #6c5ce7); color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.3s;">
                 ✨ Haz clic aquí para tu sorpresa final ✨
             </a>
+        </div>
     </div>
+
+    <!-- ====== Sección de Silver (aparece después del "Sí") ====== -->
+    <section id="silver" aria-label="Silver">
+        <h3 class="silver-titulo">Y alguien más quería saludarte… 🐾</h3>
+        <p class="silver-sub">Mira cómo se va formando 👀</p>
+
+        <div id="silver-escena" title="Acaricia a Silver">
+            <div id="polvo"></div>
+            <svg id="silver-svg" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Silver, el gatito gris">
+                <defs>
+                    <linearGradient id="plata" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#d3d8de"/><stop offset="1" stop-color="#8e96a1"/>
+                    </linearGradient>
+                    <linearGradient id="plataClara" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#e6e9ee"/><stop offset="1" stop-color="#b3bac4"/>
+                    </linearGradient>
+                </defs>
+
+                <g id="gato">
+                    <!-- sombra -->
+                    <ellipse class="aparece" style="--d:0s" cx="150" cy="314" rx="100" ry="9" fill="#000" fill-opacity=".35"/>
+
+                    <!-- cola -->
+                    <g class="cola-g">
+                        <path class="trazo" style="--d:0s;stroke:#6b7480;stroke-width:21" pathLength="1" d="M205,296 C264,304 286,242 254,204"/>
+                        <path class="trazo" style="--d:0s;stroke:#aab1ba;stroke-width:15" pathLength="1" d="M205,296 C264,304 286,242 254,204"/>
+                    </g>
+
+                    <!-- patitas traseras y cuerpo -->
+                    <ellipse class="parte" style="--d:.3s" fill="url(#plata)" cx="82" cy="282" rx="26" ry="24" pathLength="1"/>
+                    <ellipse class="parte" style="--d:.3s" fill="url(#plata)" cx="218" cy="282" rx="26" ry="24" pathLength="1"/>
+                    <path class="parte" style="--d:.6s" fill="url(#plata)" pathLength="1"
+                          d="M102,172 C68,205 60,285 94,302 C122,312 178,312 206,302 C240,285 232,205 198,172 Z"/>
+                    <ellipse class="aparece" style="--d:1.9s" fill="#e9ecf0" cx="150" cy="248" rx="28" ry="42"/>
+                    <ellipse class="parte" style="--d:1.2s" fill="url(#plataClara)" cx="122" cy="304" rx="20" ry="12" pathLength="1"/>
+                    <ellipse class="parte" style="--d:1.2s" fill="url(#plataClara)" cx="178" cy="304" rx="20" ry="12" pathLength="1"/>
+
+                    <!-- cabeza -->
+                    <g class="cabeza-g">
+                        <path class="parte" style="--d:2s" fill="url(#plata)" pathLength="1" d="M96,102 L88,38 L138,70 Z"/>
+                        <path class="parte" style="--d:2s" fill="url(#plata)" pathLength="1" d="M204,102 L212,38 L162,70 Z"/>
+                        <ellipse class="parte" style="--d:2.3s" fill="url(#plata)" cx="150" cy="118" rx="64" ry="54" pathLength="1"/>
+
+                        <path class="aparece" style="--d:3s" fill="#f2a7b8" d="M102,88 L97,56 L124,73 Z"/>
+                        <path class="aparece" style="--d:3s" fill="#f2a7b8" d="M198,88 L203,56 L176,73 Z"/>
+
+                        <!-- rayitas de la frente -->
+                        <path class="trazo" style="--d:3.2s;stroke:#6b7480;stroke-width:3.2" pathLength="1" d="M150,68 L150,86"/>
+                        <path class="trazo" style="--d:3.3s;stroke:#6b7480;stroke-width:3.2" pathLength="1" d="M134,71 L137,87"/>
+                        <path class="trazo" style="--d:3.3s;stroke:#6b7480;stroke-width:3.2" pathLength="1" d="M166,71 L163,87"/>
+
+                        <!-- mejillas -->
+                        <ellipse class="aparece" style="--d:4.8s" cx="104" cy="143" rx="10" ry="6" fill="#ff9fb5" fill-opacity=".35"/>
+                        <ellipse class="aparece" style="--d:4.8s" cx="196" cy="143" rx="10" ry="6" fill="#ff9fb5" fill-opacity=".35"/>
+
+                        <!-- ojos (cambia el color en fill="#b9e26a" si quieres que sean como los de Silver) -->
+                        <g class="aparece" style="--d:3.6s">
+                            <g class="parpadeo">
+                                <ellipse cx="126" cy="118" rx="12" ry="14" fill="#b9e26a" stroke="#3b4048" stroke-width="1.4"/>
+                                <ellipse cx="126" cy="118" rx="4.2" ry="11" fill="#171a20"/>
+                                <circle cx="122" cy="112" r="3.2" fill="#fff"/>
+                                <ellipse cx="174" cy="118" rx="12" ry="14" fill="#b9e26a" stroke="#3b4048" stroke-width="1.4"/>
+                                <ellipse cx="174" cy="118" rx="4.2" ry="11" fill="#171a20"/>
+                                <circle cx="170" cy="112" r="3.2" fill="#fff"/>
+                            </g>
+                        </g>
+
+                        <!-- nariz, boquita y bigotes -->
+                        <path class="aparece" style="--d:4.2s" fill="#f4a1b6" d="M143,136 Q150,132 157,136 Q154,145 150,147 Q146,145 143,136Z"/>
+                        <path class="trazo" style="--d:4.3s;stroke:#505762;stroke-width:2.2" pathLength="1" d="M150,147 Q150,153 142,155 M150,147 Q150,153 158,155"/>
+                        <g style="stroke:rgba(255,255,255,.88);stroke-width:1.8">
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M100,140 L58,130"/>
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M100,148 L54,148"/>
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M102,156 L60,168"/>
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M200,140 L242,130"/>
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M200,148 L246,148"/>
+                            <path class="trazo" style="--d:4.5s;stroke:rgba(255,255,255,.88);stroke-width:1.8" pathLength="1" d="M198,156 L240,168"/>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            <div class="burbuja" id="burbuja">Prrr… hola, Sarah 💗</div>
+        </div>
+
+        <p class="silver-sub" style="margin-top: 14px;">Tócalo, a ver si ronronea 💗</p>
+
+        <div class="silver-tarjeta">
+            <p>🐾 <strong>Artículo 5 (cláusula Silver):</strong> Silver, el gatito gris más guapo del universo, revisó el contrato y le puso su patita de aprobado.</p>
+            <p>🌵 <strong>Artículo 6:</strong> Regalarte suculentas, flores y cariño, para que tu casa y tu corazón siempre estén bonitos.</p>
+        </div>
+
+        <button id="btn-replay" class="btn-suave">🐾 Verlo formarse otra vez</button>
+        <br>
+        <a class="btn-final" href="amapola.html">✨ Ahora sí, tu sorpresa final ✨</a>
+    </section>
+
+    <button id="pill-silver">🐾 Silver te está esperando ↓</button>
+
+    <!-- Jardín de suculentas -->
+    <div class="jardin" id="jardin"></div>
 
     <script>
         // --- EFECTO DE GALAXIA ---
@@ -285,6 +610,254 @@
             
             // Baja automáticamente la pantalla para que vea el contrato completo
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+
+        // === SUCULENTAS (dibujadas en SVG) ===
+        const Sucu = (() => {
+            let uid = 0;
+            const f = n => +n.toFixed(2);
+
+            function maceta(c1, c2, ancho = 40) {
+                const h = ancho / 2;
+                return `<path d="M${50 - h + 4},76 L${50 + h - 4},76 L${50 + h - 9},99 Q50,103 ${50 - h + 9},99 Z" fill="${c1}"/>` +
+                       `<rect x="${50 - h - 3}" y="72" width="${ancho + 6}" height="8" rx="3.5" fill="${c2}"/>` +
+                       `<rect x="${50 - h - 3}" y="72" width="${ancho + 6}" height="3" rx="1.5" fill="#fff" opacity=".25"/>`;
+            }
+
+            // Roseta tipo echeveria: capas de pétalos con la puntita de otro color
+            function roseta({ petalos, largo, ancho, colores, punta }) {
+                let defs = '', body = '';
+                petalos.forEach((n, i) => {
+                    const id = 'sg' + (uid++);
+                    const L = largo * (1 - i * 0.17), W = ancho * (1 - i * 0.09);
+                    defs += `<linearGradient id="${id}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${colores[i]}"/><stop offset=".72" stop-color="${colores[i]}"/><stop offset="1" stop-color="${punta}"/></linearGradient>`;
+                    const d = `M0,0 C${f(-W)},${f(-L * .35)} ${f(-W * .9)},${f(-L * .92)} 0,${f(-L)} C${f(W * .9)},${f(-L * .92)} ${f(W)},${f(-L * .35)} 0,0Z`;
+                    for (let k = 0; k < n; k++) {
+                        const a = k * 360 / n + (i % 2) * (180 / n) + i * 7;
+                        body += `<path d="${d}" transform="rotate(${f(a)})" fill="url(#${id})" stroke="rgba(0,0,0,.14)" stroke-width=".6"/>`;
+                    }
+                });
+                return { defs, body };
+            }
+
+            const grupo = (r, x, y, s = 1) => `<g transform="translate(${x},${y}) scale(${s},${f(s * .82)})">${r.body}</g>`;
+
+            function aloe() {
+                const id = 'sg' + (uid++);
+                const defs = `<linearGradient id="${id}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#3b8f68"/><stop offset="1" stop-color="#a9e6b8"/></linearGradient>`;
+                const hojas = [[-66, 32], [66, 32], [-46, 40], [46, 40], [-24, 47], [24, 47], [0, 52]];
+                let body = '';
+                hojas.forEach(([a, L]) => {
+                    body += `<path d="M0,0 C-6,${f(-L * .3)} -5,${f(-L * .8)} 0,${-L} C5,${f(-L * .8)} 6,${f(-L * .3)} 0,0Z" transform="translate(50,76) rotate(${a})" fill="url(#${id})" stroke="rgba(0,0,0,.15)" stroke-width=".6"/>`;
+                    for (let j = 1; j <= 3; j++) {
+                        body += `<circle r=".9" fill="#fff" opacity=".7" transform="translate(50,76) rotate(${a}) translate(${j % 2 ? -1.4 : 1.4},${f(-L * j * .22)})"/>`;
+                    }
+                });
+                return { defs, body };
+            }
+
+            // Flor de suculenta (cinco pétalos)
+            function flor(x, y, r = 5, c = '#ff7f9a') {
+                let s = `<g transform="translate(${x},${y})">`;
+                for (let k = 0; k < 5; k++) {
+                    s += `<ellipse cx="0" cy="${f(-r * .8)}" rx="${f(r * .42)}" ry="${f(r * .85)}" transform="rotate(${k * 72})" fill="${c}" stroke="rgba(0,0,0,.1)" stroke-width=".4"/>`;
+                }
+                return s + `<circle r="${f(r * .3)}" fill="#ffe066"/></g>`;
+            }
+
+            function svg(tipo) {
+                let defs = '', body = '';
+                if (tipo === 'A') { // verde con puntitas rosas
+                    const r = roseta({ petalos: [11, 9, 7, 5, 3], largo: 34, ancho: 13, colores: ['#6fae94', '#7fbfa2', '#92cdb0', '#a8dcc0', '#c2ebd2'], punta: '#ff8fa8' });
+                    defs = r.defs; body = maceta('#c8754f', '#dd8a62') + grupo(r, 50, 56);
+                } else if (tipo === 'B') { // lavanda
+                    const r = roseta({ petalos: [12, 9, 7, 5, 3], largo: 32, ancho: 12, colores: ['#8c84cf', '#9d96dc', '#b1abe8', '#c6c1f3', '#ddd9fb'], punta: '#f6a8d2' });
+                    defs = r.defs; body = maceta('#e9ecf2', '#f8f9fc') + grupo(r, 50, 56);
+                } else if (tipo === 'C') { // aloe / haworthia
+                    const r = aloe();
+                    defs = r.defs; body = maceta('#ee9fb0', '#f8b9c6') + r.body;
+                } else if (tipo === 'D') { // con flores
+                    const r = roseta({ petalos: [10, 8, 6, 4], largo: 28, ancho: 11, colores: ['#5fa08d', '#72b3a0', '#88c6b3', '#a3d9c6'], punta: '#9ee0c9' });
+                    defs = r.defs;
+                    body = maceta('#b9a6ee', '#cdbcf6') + grupo(r, 50, 60) +
+                        `<g fill="none" stroke="#5fa88a" stroke-width="2.2" stroke-linecap="round"><path d="M50,52 C48,34 56,24 58,12"/><path d="M52,38 C50,32 48,28 47,24"/><path d="M54,30 C60,30 62,28 64,26"/></g>` +
+                        flor(58, 11, 5.5) + flor(47, 23, 4.5, '#ff9bb0') + flor(64, 25, 4.5, '#ff7f9a');
+                } else { // racimo rosado
+                    const col = { petalos: [10, 8, 6, 4, 3], largo: 28, ancho: 11, colores: ['#e79a9a', '#f0aeae', '#f6c3bd', '#fbd8cf', '#fff0e6'], punta: '#ff6f91' };
+                    const r1 = roseta(col), r2 = roseta(col), r3 = roseta(col);
+                    defs = r1.defs + r2.defs + r3.defs;
+                    body = maceta('#a9dcc7', '#c2ecd9', 54) + grupo(r1, 32, 64, .62) + grupo(r2, 68, 62, .55) + grupo(r3, 50, 58, .8);
+                }
+                return `<svg viewBox="0 0 100 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>${defs}</defs>${body}</svg>`;
+            }
+
+            // lista: [['A', 90], ['C', 70], ...] -> tipo y ancho en px
+            function montar(el, lista) {
+                lista.forEach(([tipo, w], i) => {
+                    const d = document.createElement('div');
+                    d.className = 'sucu';
+                    d.style.setProperty('--w', w + 'px');
+                    d.style.setProperty('--d', (0.4 + i * 0.28 + Math.random() * 0.2).toFixed(2) + 's');
+                    d.innerHTML = svg(tipo);
+                    el.appendChild(d);
+                });
+            }
+            return { montar, svg };
+        })();
+
+        // ================= MEJORAS (el código de arriba queda igual) =================
+
+        // --- Jardín de suculentas ---
+        Sucu.montar(document.getElementById('jardin'), [
+            ['A', 96], ['C', 74], ['D', 86], ['B', 78], ['E', 96], ['C', 66], ['A', 84], ['D', 72]
+        ]);
+        if (window.innerWidth < 600) {
+            // En celular dejamos solo algunas para que no estorben
+            [...document.querySelectorAll('#jardin .sucu')].forEach((s, i) => {
+                s.style.setProperty('--w', '58px');
+                if (i % 2) s.style.display = 'none';
+            });
+        }
+
+        // --- Estrellas fugaces de vez en cuando ---
+        function estrellaFugaz() {
+            const e = document.createElement('div');
+            e.className = 'fugaz';
+            e.style.top = `${Math.random() * 40}vh`;
+            e.style.left = `${35 + Math.random() * 65}vw`;
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 1600);
+            setTimeout(estrellaFugaz, 4000 + Math.random() * 5000);
+        }
+        setTimeout(estrellaFugaz, 2500);
+
+        // --- El "No" también se escapa en el celular y el "Sí" se pone cada vez más grande ---
+        const pista = document.getElementById('pista');
+        const frasesNo = [
+            'Casi 😏', 'Ese botón está medio roto 🙈', '¿Segura? 🥺',
+            'Silver dice que le des Sí 🐱', 'Ya no insistas 😂', 'El Sí está más grande, ¿no lo ves? 💗'
+        ];
+        let intentosNo = 0;
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            btnNo.dispatchEvent(new Event('mouseover'));
+        }, { passive: false });
+        btnNo.addEventListener('mouseover', () => {
+            intentosNo++;
+            pista.textContent = frasesNo[(intentosNo - 1) % frasesNo.length];
+            pista.classList.add('on');
+            const crecimiento = Math.min(1.5 + intentosNo * 0.12, 2.4);
+            btnSi.style.fontSize = crecimiento + 'rem';
+            btnSi.style.padding = `${12 + Math.min(intentosNo, 6)}px ${34 + Math.min(intentosNo * 3, 18)}px`;
+        });
+
+        // --- Cuando dice que "Sí": confeti de suculentas + aparece Silver ---
+        const jardin = document.getElementById('jardin');
+        const silverSec = document.getElementById('silver');
+        const pillSilver = document.getElementById('pill-silver');
+        const catSvg = document.getElementById('silver-svg');
+        const escena = document.getElementById('silver-escena');
+        const burbuja = document.getElementById('burbuja');
+        const polvo = document.getElementById('polvo');
+
+        btnSi.addEventListener('click', () => {
+            document.body.style.paddingBottom = '170px';
+            pista.classList.remove('on');
+
+            setTimeout(() => {
+                try {
+                    const formas = ['🌵', '🌿', '🌸', '🐾'].map(t => confetti.shapeFromText({ text: t, scalar: 2 }));
+                    confetti({ particleCount: 55, spread: 120, origin: { y: 0.6 }, shapes: formas, scalar: 2, flat: true });
+                } catch (e) {
+                    confetti({ particleCount: 60, spread: 120, origin: { y: 0.6 }, colors: ['#6fae94', '#a8dcc0', '#ff8fa8', '#b1abe8'] });
+                }
+            }, 350);
+
+            // Silver aparece cuando ya terminó de bajar a ver el contrato
+            setTimeout(() => {
+                silverSec.style.display = 'block';
+                pillSilver.style.display = 'block';
+                observarSilver();
+            }, 2800);
+        });
+
+        pillSilver.addEventListener('click', () => {
+            silverSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // --- Silver se va formando ---
+        let tListo, tBurbuja, yaSeFormo = false;
+
+        function polvoEstelar() {
+            polvo.innerHTML = '';
+            const ancho = escena.clientWidth, alto = escena.clientHeight;
+            for (let i = 0; i < 34; i++) {
+                const p = document.createElement('span');
+                p.className = 'polvo-p';
+                p.style.left = `${22 + Math.random() * 56}%`;
+                p.style.top = `${18 + Math.random() * 74}%`;
+                polvo.appendChild(p);
+                const ang = Math.random() * Math.PI * 2, dist = 140 + Math.random() * 120;
+                const sx = Math.cos(ang) * dist, sy = Math.sin(ang) * dist;
+                p.animate([
+                    { transform: `translate(${sx}px, ${sy}px) scale(1.2)`, opacity: 0 },
+                    { opacity: 1, offset: .25 },
+                    { transform: 'translate(0, 0) scale(.3)', opacity: 0 }
+                ], { duration: 1800 + Math.random() * 1400, delay: Math.random() * 4200, easing: 'ease-in', fill: 'both' });
+            }
+        }
+
+        function formarSilver() {
+            yaSeFormo = true;
+            clearTimeout(tListo); clearTimeout(tBurbuja);
+            catSvg.classList.remove('forma', 'listo');
+            burbuja.classList.remove('on');
+            void catSvg.getBoundingClientRect(); // reinicia las animaciones
+            catSvg.classList.add('forma');
+            polvoEstelar();
+            tBurbuja = setTimeout(() => burbuja.classList.add('on'), 5800);
+            tListo = setTimeout(() => catSvg.classList.add('listo'), 6200);
+        }
+
+        function observarSilver() {
+            if (!('IntersectionObserver' in window)) { formarSilver(); pillSilver.style.display = 'none'; return; }
+            // Se forma cuando Silver entra en pantalla
+            const obsEscena = new IntersectionObserver((entradas) => {
+                if (entradas[0].isIntersecting && !yaSeFormo) formarSilver();
+            }, { threshold: 0.55 });
+            obsEscena.observe(escena);
+            // El botoncito de "baja" se esconde cuando ya está viendo a Silver
+            const obsSec = new IntersectionObserver((entradas) => {
+                pillSilver.style.display = entradas[0].isIntersecting ? 'none' : 'block';
+            }, { threshold: 0.25 });
+            obsSec.observe(silverSec);
+        }
+
+        document.getElementById('btn-replay').addEventListener('click', formarSilver);
+
+        // --- Acariciar a Silver ---
+        const mimos = ['Prrr… 💗', '¡Más caricias!', 'Miau (traducción: te quiero)', 'Silver aprueba 🐾', 'Prrrrrr…', '¡Y snacks también!'];
+        let iMimo = 0;
+        escena.addEventListener('click', (ev) => {
+            if (!catSvg.classList.contains('listo')) return;
+            const r = escena.getBoundingClientRect();
+            for (let i = 0; i < 4; i++) {
+                const h = document.createElement('span');
+                h.className = 'corazon-flota';
+                h.textContent = ['💗', '💖', '🌸', '🐾'][Math.floor(Math.random() * 4)];
+                h.style.left = `${ev.clientX - r.left - 12 + (Math.random() - 0.5) * 50}px`;
+                h.style.top = `${ev.clientY - r.top - 12}px`;
+                escena.appendChild(h);
+                h.animate([
+                    { transform: 'translateY(0) scale(.6)', opacity: 1 },
+                    { transform: `translate(${(Math.random() - 0.5) * 60}px, -110px) scale(1.2)`, opacity: 0 }
+                ], { duration: 1300 + Math.random() * 500, easing: 'ease-out' }).onfinish = () => h.remove();
+            }
+            burbuja.textContent = mimos[iMimo++ % mimos.length];
+            burbuja.classList.add('on');
+            catSvg.classList.remove('ronrronea');
+            void catSvg.getBoundingClientRect();
+            catSvg.classList.add('ronrronea');
         });
     </script>
 

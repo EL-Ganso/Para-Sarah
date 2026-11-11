@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah 🌸</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600;800&display=swap');
+
+        /* === MISMO FONDO DE GALAXIA DEL INICIO === */
+        html, body { margin: 0; padding: 0; height: 100%; }
+        body {
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .estrella {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0;
+            animation: parpadeo infinite ease-in-out;
+        }
+        @keyframes parpadeo {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .fugaz {
+            position: absolute;
+            width: 90px; height: 2px;
+            background: linear-gradient(90deg, #fff, transparent);
+            border-radius: 2px;
+            opacity: 0;
+            z-index: 0;
+            animation: fugaz 1.4s ease-out forwards;
+        }
+        @keyframes fugaz {
+            0%   { opacity: 0; transform: translate(0, 0) rotate(-35deg); }
+            15%  { opacity: 1; }
+            100% { opacity: 0; transform: translate(-320px, 220px) rotate(-35deg); }
+        }
+
+        canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .pie {
+            position: absolute;
+            left: 0; right: 0; bottom: 5%;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 2.5s ease, transform 2.5s ease;
+        }
+        .pie.on { opacity: 1; transform: translateY(0); }
+        .pie h1 {
+            margin: 0;
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.4rem;
+            color: #ff9a9e;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8), 0 0 22px rgba(255, 154, 158, 0.8);
+        }
+
+        .controles {
+            position: absolute;
+            z-index: 3;
+            top: 16px; left: 16px; right: 16px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .controles a, .controles button {
+            pointer-events: auto;
+            font-family: 'Poppins', sans-serif;
+            font-size: .9rem;
+            color: #dfe6e9;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .3);
+            border-radius: 30px;
+            padding: 8px 18px;
+            text-decoration: none;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+        .controles a:hover, .controles button:hover { background: rgba(255, 255, 255, .22); }
+
+        @media (max-width: 600px) {
+            .pie h1 { font-size: 2.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="lienzo"></canvas>
+
+    <div class="controles">
+        <a href="amapola.html">← Volver</a>
+        <button id="btn-otra">🌸 Verlo otra vez</button>
+    </div>
+
+    <div class="pie" id="pie"><h1>Te amo, Sarah 💗</h1></div>
+
+    <script>
+        // ---------- FONDO: estrellas (igual que el inicio) ----------
+        (function () {
+            for (let i = 0; i < 100; i++) {
+                const e = document.createElement('div');
+                e.classList.add('estrella');
+                e.style.left = `${Math.random() * 100}vw`;
+                e.style.top = `${Math.random() * 100}vh`;
+                const t = Math.random() * 2 + 1;
+                e.style.width = `${t}px`; e.style.height = `${t}px`;
+                e.style.animationDuration = `${Math.random() * 3 + 1.5}s`;
+                e.style.animationDelay = `${Math.random() * 2}s`;
+                const colores = ['#ffffff', '#ffffff', '#ffeaa7', '#81ecec', '#fab1a0'];
+                e.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                document.body.appendChild(e);
+            }
+            (function fugaz() {
+                const e = document.createElement('div');
+                e.className = 'fugaz';
+                e.style.top = `${Math.random() * 40}vh`;
+                e.style.left = `${35 + Math.random() * 65}vw`;
+                document.body.appendChild(e);
+                setTimeout(() => e.remove(), 1600);
+                setTimeout(fugaz, 4000 + Math.random() * 5000);
+            })();
+        })();
+
+        // ---------- SPRITES: flores y suculentas dibujadas en canvas ----------
+        const TAU = Math.PI * 2;
+
+        function petalo(x, len, wid, c0, c1) {
+            const g = x.createLinearGradient(0, 0, 0, -len);
+            g.addColorStop(0, c0); g.addColorStop(.7, c0); g.addColorStop(1, c1);
+            x.beginPath();
+            x.moveTo(0, 0);
+            x.bezierCurveTo(-wid, -len * .3, -wid * .9, -len * .92, 0, -len);
+            x.bezierCurveTo(wid * .9, -len * .92, wid, -len * .3, 0, 0);
+            x.fillStyle = g; x.fill();
+            x.strokeStyle = 'rgba(0,0,0,.16)'; x.lineWidth = 1; x.stroke();
+        }
+        function anillo(x, n, len, wid, c0, c1, off = 0) {
+            for (let k = 0; k < n; k++) {
+                x.save(); x.rotate(off + k * TAU / n); petalo(x, len, wid, c0, c1); x.restore();
+            }
+        }
+        function disco(x, r, color, y = 0) { x.beginPath(); x.arc(0, y, r, 0, TAU); x.fillStyle = color; x.fill(); }
+        function puntos(x, n, rmax, color, rp = 1.4) {
+            x.fillStyle = color;
+            for (let i = 0; i < n; i++) {
+                const a = i * 2.39996, r = rmax * Math.sqrt(i / n);
+                x.beginPath(); x.arc(Math.cos(a) * r, Math.sin(a) * r, rp, 0, TAU); x.fill();
+            }
+        }
+        // roseta tipo echeveria
+        function roseta(x, cols, punta, n = [11, 9, 7, 5, 3], largo = 58, ancho = 21) {
+            n.forEach((c, i) => {
+                const L = largo * (1 - i * .17), W = ancho * (1 - i * .09);
+                anillo(x, c, L, W, cols[i], punta, (i % 2) * (Math.PI / c) + i * .12);
+            });
+        }
+
+        const defs = [
+            // --- FLORES ---
+            x => { anillo(x, 4, 56, 34, '#b3122f', '#ff4757', .4); anillo(x, 4, 40, 26, '#d4213d', '#ff6b7a', 1.2); disco(x, 9, '#2c3e50'); puntos(x, 22, 14, '#f1c40f'); },        // amapola
+            x => { anillo(x, 15, 56, 8, '#e9eef7', '#ffffff'); disco(x, 13, '#ffd93d'); puntos(x, 14, 9, '#e6a800', 1.2); },                                                       // margarita
+            x => { anillo(x, 20, 58, 9, '#e69500', '#ffd93d'); anillo(x, 20, 46, 8, '#f1a900', '#ffe27a', .15); disco(x, 19, '#5a3516'); puntos(x, 40, 17, '#8a5a2b', 1.5); },       // girasol
+            x => { anillo(x, 5, 54, 24, '#ff8fb5', '#ffe0ec', .3); disco(x, 6, '#ff4f87'); puntos(x, 8, 9, '#ffd1e0', 1.2); },                                                      // cerezo
+            x => { anillo(x, 8, 56, 17, '#c2255c', '#ff9dc3'); disco(x, 8, '#ffd43b'); },                                                                                           // cosmos
+            x => { anillo(x, 5, 52, 23, '#5f3dc4', '#c4b0ff', .1); disco(x, 7, '#ffd43b'); },                                                                                       // pensamiento
+            x => { anillo(x, 7, 58, 25, '#a4133c', '#ff5d82'); anillo(x, 6, 44, 21, '#c9184a', '#ff8fa3', .4); anillo(x, 5, 31, 16, '#e5446d', '#ffb3c1', .9); anillo(x, 4, 19, 11, '#ff758f', '#ffd0d9', .2); }, // rosa
+            x => { anillo(x, 6, 56, 20, '#ff7b00', '#ffd166', .2); anillo(x, 6, 38, 15, '#ff9e1b', '#ffe29a', .7); disco(x, 6, '#7a3e00'); },                                         // flor naranja
+            // --- SUCULENTAS ---
+            x => roseta(x, ['#6fae94', '#7fbfa2', '#92cdb0', '#a8dcc0', '#c2ebd2'], '#ff8fa8'),                                                                                      // echeveria verde/rosa
+            x => roseta(x, ['#8c84cf', '#9d96dc', '#b1abe8', '#c6c1f3', '#ddd9fb'], '#f6a8d2', [12, 9, 7, 5, 3], 56, 20),                                                           // echeveria lavanda
+            x => roseta(x, ['#e79a9a', '#f0aeae', '#f6c3bd', '#fbd8cf', '#fff0e6'], '#ff6f91', [10, 8, 6, 4, 3]),                                                                    // suculenta rosada
+            x => { anillo(x, 12, 60, 8, '#2f7d5b', '#9ae2b0'); anillo(x, 12, 46, 7, '#3b8f68', '#b4ecc3', .26); anillo(x, 8, 30, 6, '#4aa379', '#caf5d4', .1); puntos(x, 16, 24, 'rgba(255,255,255,.65)', 1.1); }, // aloe / agave
+            x => { roseta(x, ['#5fa08d', '#72b3a0', '#88c6b3', '#a3d9c6'], '#9ee0c9', [10, 8, 6, 4], 44, 16);
+                   [[-30, -26], [30, -30], [0, 34], [-28, 22], [30, 20]].forEach(([px, py]) => { x.save(); x.translate(px, py); anillo(x, 5, 15, 6.5, '#ff7a90', '#ffc2cf'); disco(x, 2.6, '#ffe066'); x.restore(); }); }, // suculenta con flores
+            x => { anillo(x, 10, 60, 14, '#4a7c6a', '#d7f0e3'); anillo(x, 8, 44, 13, '#5c9a85', '#e6f8ef', .3); anillo(x, 6, 28, 10, '#79b8a1', '#f2fcf7', .1); }                      // haworthia clara
+        ];
+        const SPR = defs.map(fn => {
+            const c = document.createElement('canvas');
+            c.width = c.height = 128;
+            const x = c.getContext('2d');
+            x.translate(64, 64);
+            x.scale(1.02, 1.02);
+            fn(x);
+            return c;
+        });
+
+        // ---------- LIENZO Y TEXTO ----------
+        const cv = document.getElementById('lienzo');
+        const ctx = cv.getContext('2d');
+        const pie = document.getElementById('pie');
+        let W, H, DPR, parts = [], T0 = 0, last = 0, todoListo = false, glow = null;
+
+        function resize() {
+            DPR = Math.min(window.devicePixelRatio || 1, 2);
+            W = window.innerWidth; H = window.innerHeight;
+            cv.width = W * DPR; cv.height = H * DPR;
+            cv.style.width = W + 'px'; cv.style.height = H + 'px';
+            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+
+        const FUENTE = '800 100px Poppins, "Arial Black", Impact, sans-serif';
+
+        // Dibuja la palabra en un canvas y devuelve los puntos donde irá cada flor
+        function calcularPuntos() {
+            const vertical = W / H < 0.85;
+            const lineas = vertical ? ['SAR', 'AH'] : ['SARAH'];
+            const off = document.createElement('canvas');
+            off.width = W; off.height = H;
+            const o = off.getContext('2d');
+            o.font = FUENTE;
+            const anchoMax = Math.max(...lineas.map(l => o.measureText(l).width));
+            let fs = (W * (vertical ? 0.9 : 0.88)) / anchoMax * 100;
+            fs = Math.min(fs, (H * (vertical ? 0.26 : 0.55)) / 0.78);
+            const interlineado = fs * 0.92;
+            const cy = H * (vertical ? 0.44 : 0.47);
+            o.font = FUENTE.replace('100px', fs + 'px');
+            o.textAlign = 'center'; o.textBaseline = 'middle';
+            o.fillStyle = '#fff';
+            lineas.forEach((l, i) => o.fillText(l, W / 2, cy + (i - (lineas.length - 1) / 2) * interlineado));
+
+            // resplandor suave detrás de la palabra (se prepara una sola vez)
+            glow = document.createElement('canvas');
+            glow.width = W; glow.height = H;
+            const g = glow.getContext('2d');
+            g.font = o.font; g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.shadowColor = 'rgba(255,120,160,.9)'; g.shadowBlur = fs * 0.18;
+            g.fillStyle = 'rgba(255,150,180,.35)';
+            lineas.forEach((l, i) => g.fillText(l, W / 2, cy + (i - (lineas.length - 1) / 2) * interlineado));
+
+            const datos = o.getImageData(0, 0, W, H).data;
+            const opaco = (x, y) => {
+                x = Math.round(x); y = Math.round(y);
+                return x >= 0 && y >= 0 && x < W && y < H && datos[(y * W + x) * 4 + 3] > 128;
+            };
+            let area = 0;
+            for (let y = 0; y < H; y += 3) for (let x = 0; x < W; x += 3) if (opaco(x, y)) area += 9;
+            const objetivo = vertical ? 330 : (W < 900 ? 380 : 560);
+            const paso = Math.sqrt(area / (objetivo * 0.866));
+            const pts = [];
+            for (let y = 0, fila = 0; y < H; y += paso * 0.866, fila++) {
+                for (let x = (fila % 2) ? paso / 2 : 0; x < W; x += paso) {
+                    const jx = x + (Math.random() - .5) * paso * .25, jy = y + (Math.random() - .5) * paso * .25;
+                    if (opaco(jx, jy)) pts.push({ x: jx, y: jy });
+                }
+            }
+            return { pts, paso };
+        }
+
+        // ---------- PARTÍCULAS ----------
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const clamp01 = v => Math.max(0, Math.min(1, v));
+        const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const easeOutBack = t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+
+        function construir() {
+            resize();
+            const { pts, paso } = calcularPuntos();
+            parts = pts.map(p => ({
+                sp: SPR[(Math.random() * SPR.length) | 0],
+                x0: Math.random() * W, y0: Math.random() * H,
+                ax: 10 + Math.random() * 30, ay: 10 + Math.random() * 30,
+                fx: .3 + Math.random() * .6, fy: .3 + Math.random() * .6,
+                px: Math.random() * TAU, py: Math.random() * TAU,
+                s0: 38 + Math.random() * 52,
+                s1: paso * 1.85 * (0.92 + Math.random() * 0.22),
+                tx: p.x, ty: p.y,
+                r: Math.random() * TAU, vr: (Math.random() - .5) * 1.2,
+                aparece: Math.random() * 2.5,
+                lanza: 5 + (p.x / W) * 3.5 + Math.random() * 3,   // se van uniendo de izquierda a derecha, poco a poco
+                dur: 2 + Math.random() * 1.2,
+                giro: (Math.random() - .5) * 180,
+                desde: false, sx: 0, sy: 0
+            }));
+            T0 = performance.now(); last = T0; todoListo = false;
+            pie.classList.remove('on');
+        }
+
+        function cuadro(ahora) {
+            const t = (ahora - T0) / 1000;
+            const dt = Math.min(0.05, (ahora - last) / 1000); last = ahora;
+            ctx.clearRect(0, 0, W, H);
+
+            // contamos cuántas ya llegaron
+            let listas = 0;
+            for (const p of parts) if (t > p.lanza + p.dur) listas++;
+            const avance = parts.length ? listas / parts.length : 0;
+            if (glow && avance > 0) { ctx.globalAlpha = avance * avance; ctx.drawImage(glow, 0, 0, W, H); ctx.globalAlpha = 1; }
+
+            for (const p of parts) {
+                if (t < p.aparece) continue;
+                const a = clamp01((t - p.aparece) / .9);
+                const fx = p.x0 + Math.sin(t * p.fx + p.px) * p.ax;
+                const fy = p.y0 + Math.cos(t * p.fy + p.py) * p.ay;
+                let x, y, s, u = 0;
+                if (t < p.lanza) {
+                    x = fx; y = fy; s = p.s0 * easeOutBack(a);
+                } else {
+                    if (!p.desde) { p.sx = fx; p.sy = fy; p.desde = true; }
+                    u = clamp01((t - p.lanza) / p.dur);
+                    const e = easeInOut(u);
+                    const dx = p.tx - p.sx, dy = p.ty - p.sy, len = Math.hypot(dx, dy) || 1;
+                    const curva = Math.sin(u * Math.PI) * p.giro;
+                    x = lerp(p.sx, p.tx, e) + (-dy / len) * curva;
+                    y = lerp(p.sy, p.ty, e) + (dx / len) * curva;
+                    s = lerp(p.s0, p.s1, e);
+                    if (u >= 1) s *= 1 + 0.035 * Math.sin(t * 2 + p.px);   // respiran suavemente
+                }
+                p.r += p.vr * dt * (u >= 1 ? .3 : 1);
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(p.r);
+                ctx.drawImage(p.sp, -s / 2, -s / 2, s, s);
+                ctx.restore();
+            }
+
+            if (!todoListo && avance >= 0.995) { todoListo = true; pie.classList.add('on'); }
+            requestAnimationFrame(cuadro);
+        }
+
+        // Esperamos la fuente para que la palabra salga bien gruesa
+        function iniciar() {
+            construir();
+            requestAnimationFrame(cuadro);
+        }
+        Promise.race([
+            document.fonts.load('800 100px Poppins').catch(() => {}),
+            new Promise(r => setTimeout(r, 1800))
+        ]).then(iniciar);
+
+        document.getElementById('btn-otra').addEventListener('click', construir);
+        let tRes;
+        window.addEventListener('resize', () => { clearTimeout(tRes); tRes = setTimeout(construir, 300); });
+    </script>
+</body>
+</html>
